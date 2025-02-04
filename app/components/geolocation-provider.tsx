@@ -42,7 +42,7 @@ export function GeolocationProvider({
             isPending: false,
           });
         },
-        (error) => {
+        (geoError) => {
           setGeolocation((prev) => ({
             ...prev,
             error:
@@ -54,7 +54,7 @@ export function GeolocationProvider({
     } else {
       setGeolocation((prev) => ({
         ...prev,
-        error: "Geolocation is not supported by your browser.",
+        error: "Geolocalização não é suportada pelo seu navegador.",
         isPending: false,
       }));
     }

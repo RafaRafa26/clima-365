@@ -5,14 +5,7 @@ import { useGeolocation } from "./geolocation-provider";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import Image from "next/image";
-
-type DailyForecast = {
-  date: string;
-  tempMax: number;
-  tempMin: number;
-  icon: string;
-  description: string;
-};
+import type { DailyForecast, OpenWeatherForecastResponse } from "@/lib/types";
 
 export default function DailyForecast() {
   const { latitude, longitude } = useGeolocation();
@@ -28,36 +21,39 @@ export default function DailyForecast() {
         .then((response) => response.json())
         .then((data) => {
           const dailyData = data.list
-            .reduce((acc: DailyForecast[], reading: any) => {
-              const date = new Date(reading.dt * 1000).toLocaleDateString(
-                "pt-BR",
-                {
-                  weekday: "short",
-                  day: "2-digit",
-                  month: "2-digit",
+            .reduce(
+              (acc: DailyForecast[], reading: OpenWeatherForecastResponse) => {
+                const date = new Date(reading.dt * 1000).toLocaleDateString(
+                  "pt-BR",
+                  {
+                    weekday: "short",
+                    day: "2-digit",
+                    month: "2-digit",
+                  }
+                );
+                const existingDay = acc.find((day) => day.date === date);
+                if (existingDay) {
+                  existingDay.tempMax = Math.max(
+                    existingDay.tempMax,
+                    reading.main.temp_max
+                  );
+                  existingDay.tempMin = Math.min(
+                    existingDay.tempMin,
+                    reading.main.temp_min
+                  );
+                } else {
+                  acc.push({
+                    date,
+                    tempMax: reading.main.temp_max,
+                    tempMin: reading.main.temp_min,
+                    icon: `http://openweathermap.org/img/wn/${reading.weather[0].icon}.png`,
+                    description: reading.weather[0].description,
+                  });
                 }
-              );
-              const existingDay = acc.find((day) => day.date === date);
-              if (existingDay) {
-                existingDay.tempMax = Math.max(
-                  existingDay.tempMax,
-                  reading.main.temp_max
-                );
-                existingDay.tempMin = Math.min(
-                  existingDay.tempMin,
-                  reading.main.temp_min
-                );
-              } else {
-                acc.push({
-                  date,
-                  tempMax: reading.main.temp_max,
-                  tempMin: reading.main.temp_min,
-                  icon: `http://openweathermap.org/img/wn/${reading.weather[0].icon}.png`,
-                  description: reading.weather[0].description,
-                });
-              }
-              return acc;
-            }, [])
+                return acc;
+              },
+              []
+            )
             .slice(0, 5);
           setForecast(dailyData);
           setLoading(false);
