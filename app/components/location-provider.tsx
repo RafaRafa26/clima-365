@@ -36,7 +36,7 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
             error: null,
           });
         },
-        (error) => {
+        () => {
           setLocation((prev) => ({
             ...prev,
             error:

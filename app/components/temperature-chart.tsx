@@ -14,11 +14,6 @@ import { useGeolocation } from "./geolocation-provider";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import type { TemperatureChartData } from "@/lib/types";
 
-type HourlyTemperature = {
-  time: string;
-  temperature: number;
-};
-
 export default function TemperatureChart() {
   const { latitude, longitude } = useGeolocation();
   const [data, setData] = useState<TemperatureChartData[]>([]);
@@ -32,13 +27,15 @@ export default function TemperatureChart() {
       )
         .then((response) => response.json())
         .then((result) => {
-          const hourlyData = result.list.slice(0, 8).map((item: any) => ({
-            time: new Date(item.dt * 1000).toLocaleTimeString("pt-BR", {
-              hour: "2-digit",
-              minute: "2-digit",
-            }),
-            temperature: item.main.temp,
-          }));
+          const hourlyData = result.list
+            .slice(0, 8)
+            .map((item: { dt: number; main: { temp: number } }) => ({
+              time: new Date(item.dt * 1000).toLocaleTimeString("pt-BR", {
+                hour: "2-digit",
+                minute: "2-digit",
+              }),
+              temperature: item.main.temp,
+            }));
           setData(hourlyData);
           setLoading(false);
         })

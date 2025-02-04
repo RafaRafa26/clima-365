@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useGeolocation } from "./geolocation-provider";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import Image from "next/image";
 
 type DailyForecast = {
   date: string;
@@ -81,10 +82,13 @@ export default function DailyForecast() {
             {forecast.map((day, index) => (
               <div key={index} className="text-center">
                 <p className="font-medium">{day.date.replace(",", "")}</p>
-                <img
+                <Image
                   src={day.icon || "/placeholder.svg"}
                   alt={day.description}
-                  className="mx-auto w-10 h-10"
+                  width={40}
+                  height={40}
+                  className="mx-auto"
+                  unoptimized
                 />
                 <p>{Math.round(day.tempMax)}°C</p>
                 <p className="text-muted-foreground">

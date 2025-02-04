@@ -17,7 +17,7 @@ export default function Navbar() {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <Link href="/" className="text-2xl font-bold text-primary">
-            ClimaPro
+            Clima 365
           </Link>
           <div className="hidden md:flex items-center space-x-4">
             <SearchBar />

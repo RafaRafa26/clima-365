@@ -4,11 +4,22 @@ import { useEffect, useState } from "react";
 import { useGeolocation } from "./geolocation-provider";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import Image from "next/image";
 
 type HourlyForecast = {
   time: string;
   temperature: number;
   icon: string;
+};
+
+type WeatherItem = {
+  dt: number;
+  main: {
+    temp: number;
+  };
+  weather: Array<{
+    icon: string;
+  }>;
 };
 
 export default function HourlyForecast() {
@@ -27,10 +38,11 @@ export default function HourlyForecast() {
           const currentTime = new Date().getTime();
           const hourlyData = data.list
             .filter(
-              (item: any) => new Date(item.dt * 1000).getTime() > currentTime
+              (item: WeatherItem) =>
+                new Date(item.dt * 1000).getTime() > currentTime
             )
             .slice(0, 6)
-            .map((item: any) => ({
+            .map((item: WeatherItem) => ({
               time: new Date(item.dt * 1000).toLocaleTimeString("pt-BR", {
                 hour: "2-digit",
                 minute: "2-digit",
@@ -61,10 +73,13 @@ export default function HourlyForecast() {
             {forecast.map((hour, index) => (
               <div key={index} className="text-center">
                 <p className="font-medium">{hour.time}</p>
-                <img
+                <Image
                   src={hour.icon || "/placeholder.svg"}
                   alt="Ícone do tempo"
-                  className="mx-auto w-8 h-8"
+                  width={32}
+                  height={32}
+                  className="mx-auto"
+                  unoptimized
                 />
                 <p className="text-primary">{Math.round(hour.temperature)}°C</p>
               </div>
