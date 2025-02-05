@@ -5,16 +5,7 @@ import { useGeolocation } from "./geolocation-provider";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Droplets, Thermometer, Wind } from "lucide-react";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
-
-
-type WeatherData = {
-  cityName: string;
-  temperature: number;
-  description: string;
-  humidity: number;
-  windSpeed: number;
-  feelsLike: number;
-};
+import type { WeatherData } from "@/lib/types";
 
 export default function CurrentWeather() {
   const { latitude, longitude, error } = useGeolocation();
@@ -36,6 +27,7 @@ export default function CurrentWeather() {
             humidity: data.main.humidity,
             windSpeed: data.wind.speed,
             feelsLike: data.main.feels_like,
+            icon: `http://openweathermap.org/img/wn/${data.weather[0].icon}.png`,
           });
           setLoading(false);
         })

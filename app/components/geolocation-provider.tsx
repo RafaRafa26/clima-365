@@ -42,7 +42,7 @@ export function GeolocationProvider({
             isPending: false,
           });
         },
-        (geoError) => {
+        () => {
           setGeolocation((prev) => ({
             ...prev,
             error:

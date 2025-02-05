@@ -1,11 +1,12 @@
 // Tipos para dados meteorológicos
 export type WeatherData = {
+  cityName: string;
   temperature: number;
   description: string;
   humidity: number;
   windSpeed: number;
   feelsLike: number;
-  icon: string;
+  icon?: string;
 };
 
 export type HourlyForecast = {
