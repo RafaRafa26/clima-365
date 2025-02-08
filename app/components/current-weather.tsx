@@ -1,22 +1,25 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useGeolocation } from "./geolocation-provider";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Droplets, Thermometer, Wind } from "lucide-react";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import type { WeatherData } from "@/lib/types";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
-export default function CurrentWeather() {
-  const { latitude, longitude, error } = useGeolocation();
+type CurrentWeatherProps = {
+  lat: number | null;
+  lon: number | null;
+};
+
+export default function CurrentWeather({ lat, lon }: CurrentWeatherProps) {
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (latitude && longitude) {
+    if (lat && lon) {
       setLoading(true);
       fetch(
-        `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&lang=pt_br&appid=${process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY}`
+        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&lang=pt_br&appid=${process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY}`
       )
         .then((response) => response.json())
         .then((data) => {
@@ -27,7 +30,6 @@ export default function CurrentWeather() {
             humidity: data.main.humidity,
             windSpeed: data.wind.speed,
             feelsLike: data.main.feels_like,
-            icon: `http://openweathermap.org/img/wn/${data.weather[0].icon}.png`,
           });
           setLoading(false);
         })
@@ -36,11 +38,7 @@ export default function CurrentWeather() {
           setLoading(false);
         });
     }
-  }, [latitude, longitude]);
-
-  if (error) {
-    return <p className="text-center text-destructive">{error}</p>;
-  }
+  }, [lat, lon]);
 
   return (
     <Card className="w-full max-w-2xl mx-auto">

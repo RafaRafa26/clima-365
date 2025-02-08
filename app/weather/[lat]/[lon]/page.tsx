@@ -1,29 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import WeatherPage from "@/app/components/weather-page";
 import { useParams } from "next/navigation";
-import CurrentWeather from "@/app/components/current-weather";
-import HourlyForecast from "@/app/components/hourly-forecast";
-import DailyForecast from "@/app/components/daily-forecast";
 
 
-export default function WeatherPage() {
+export default function WeatherPageWrapper() {
   const params = useParams();
-  const [cityName, setCityName] = useState("");
+  const lat = Number.parseFloat(params.lat as string);
+  const lon = Number.parseFloat(params.lon as string);
 
-  useEffect(() => {
-    const { lat, lon } = params;
-    // Aqui você faria uma chamada para a API para obter o nome da cidade
-    // Por enquanto, vamos apenas simular isso
-    setCityName(`Cidade (${lat}, ${lon})`);
-  }, [params]);
-
-  return (
-    <div className="space-y-8">
-      <h1 className="text-3xl font-bold">{cityName}</h1>
-      <CurrentWeather />
-      <HourlyForecast />
-      <DailyForecast />
-    </div>
-  );
+  return <WeatherPage lat={lat} lon={lon} />;
 }

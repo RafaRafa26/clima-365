@@ -1,40 +1,53 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Star } from "lucide-react";
-import { FavoriteCity, useFavoriteCities } from "./favorite-cities";
+import { Input } from "@/components/ui/input";
+import { Star, Search } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useDebounce } from "@/lib/hooks";
+import { City } from "@/lib/types";
 
 
 type LocationSearchProps = {
   errorMessage?: string;
+  onLocationSelect: (lat: number, lon: number) => void;
 };
 
-export default function LocationSearch({ errorMessage }: LocationSearchProps) {
+export default function LocationSearch({
+  errorMessage,
+  onLocationSelect,
+}: LocationSearchProps) {
   const [search, setSearch] = useState("");
-  const [searchResult, setSearchResult] = useState<FavoriteCity | null>(null);
-  const { addFavoriteCity } = useFavoriteCities();
+  const [suggestions, setSuggestions] = useState<City[]>([]);
+  const [searchResult, setSearchResult] = useState<City | null>(null);
+  const router = useRouter();
+  const debouncedSearch = useDebounce(search, 300);
 
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
-    // Aqui você normalmente chamaria uma API para buscar dados meteorológicos para a localização pesquisada
-    // Por enquanto, vamos simular uma resposta
-    const result: FavoriteCity = {
-      name: search,
-      lat: Math.random() * 180 - 90,
-      lon: Math.random() * 360 - 180,
-    };
-    setSearchResult(result);
-  };
-
-  const handleAddFavorite = () => {
-    if (searchResult) {
-      addFavoriteCity(searchResult);
-      setSearchResult(null);
-      setSearch("");
+  useEffect(() => {
+    if (debouncedSearch.length > 2) {
+      fetch(
+        `https://api.openweathermap.org/geo/1.0/direct?q=${debouncedSearch}&limit=5&appid=${process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY}`
+      )
+        .then((response) => response.json())
+        .then((data: City[]) => {
+          setSuggestions(data);
+        })
+        .catch((error) => {
+          console.error("Erro ao buscar sugestões:", error);
+        });
+    } else {
+      setSuggestions([]);
     }
+  }, [debouncedSearch]);
+
+
+  const handleCitySelect = (city: City) => {
+    setSearchResult({ name: city.name, state: city.state, country: city.country, lat: city.lat, lon: city.lon });
+    onLocationSelect(city.lat, city.lon);
+    setSearch("");
+    setSuggestions([]);
   };
 
   return (
@@ -46,27 +59,52 @@ export default function LocationSearch({ errorMessage }: LocationSearchProps) {
         {errorMessage && (
           <p className="text-destructive mb-4">{errorMessage}</p>
         )}
-        <form onSubmit={handleSearch} className="space-y-4">
-          <Input
-            type="text"
-            placeholder="Digite uma cidade ou endereço..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          <Button type="submit" className="w-full">
+        <div className="space-y-4">
+          <div className="relative">
+            <Input
+              type="text"
+              placeholder="Buscar cidade..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full"
+            />
+            {suggestions.length > 0 && (
+              <ul className="absolute z-10 w-full bg-background border border-input rounded-md mt-1 max-h-60 overflow-auto">
+                {suggestions.map((city, index) => (
+                  <li
+                    key={index}
+                    className="px-4 py-2 hover:bg-accent cursor-pointer"
+                    onClick={() => handleCitySelect(city)}
+                  >
+                    {city.name}, {city.state ? `${city.state}, ` : ""}
+                    {city.country}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          <Button
+            type="button"
+            className="w-full"
+            onClick={() => {
+              if (searchResult) {
+                router.push(`/weather/${searchResult.lat}/${searchResult.lon}`);
+              }
+            }}
+          >
             <Search className="mr-2 h-4 w-4" />
             Buscar
           </Button>
-        </form>
-        {searchResult && (
-          <div className="mt-4 flex items-center justify-between">
-            <p>{searchResult.name}</p>
-            <Button variant="outline" size="sm" onClick={handleAddFavorite}>
-              <Star className="mr-2 h-4 w-4" />
-              Adicionar aos favoritos
-            </Button>
-          </div>
-        )}
+          {searchResult && (
+            <div className="mt-4 flex items-center justify-between">
+              <p>{searchResult.name}</p>
+              <Button variant="outline" size="sm">
+                <Star className="mr-2 h-4 w-4" />
+                Adicionar aos favoritos
+              </Button>
+            </div>
+          )}
+        </div>
       </CardContent>
     </Card>
   );

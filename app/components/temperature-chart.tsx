@@ -10,20 +10,23 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { useGeolocation } from "./geolocation-provider";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import type { TemperatureChartData } from "@/lib/types";
 
-export default function TemperatureChart() {
-  const { latitude, longitude } = useGeolocation();
+type TemperatureChartProps = {
+  lat: number | null;
+  lon: number | null;
+};
+
+export default function TemperatureChart({ lat, lon }: TemperatureChartProps) {
   const [data, setData] = useState<TemperatureChartData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (latitude && longitude) {
+    if (lat && lon) {
       setLoading(true);
       fetch(
-        `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&units=metric&lang=pt_br&appid=${process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY}`
+        `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&lang=pt_br&appid=${process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY}`
       )
         .then((response) => response.json())
         .then((result) => {
@@ -44,7 +47,7 @@ export default function TemperatureChart() {
           setLoading(false);
         });
     }
-  }, [latitude, longitude]);
+  }, [lat, lon]);
 
   return (
     <Card className="w-full max-w-2xl mx-auto">

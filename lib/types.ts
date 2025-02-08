@@ -23,12 +23,6 @@ export type DailyForecast = {
   description: string;
 };
 
-// Tipo para cidade favorita
-export type FavoriteCity = {
-  name: string;
-  lat: number;
-  lon: number;
-};
 
 // Tipo para dados do gráfico de temperatura
 export type TemperatureChartData = {
@@ -47,4 +41,13 @@ export type OpenWeatherForecastResponse = {
     description: string;
     icon: string;
   }>;
+};
+
+// Tipo para cidade (adicionado)
+export type City = {
+  name: string;
+  lat: number;
+  lon: number;
+  country: string;
+  state?: string;
 };
