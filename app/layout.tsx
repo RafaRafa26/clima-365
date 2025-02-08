@@ -3,18 +3,19 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 
 import { Toaster } from "@/components/ui/toaster";
+import { Analytics } from "@vercel/analytics/react";
 import Script from "next/script";
-import type React from "react"; // Added import for React
-import { ThemeProvider } from "./components/theme-provider";
+import type React from "react";
+import Footer from "./components/footer";
 import { GeolocationProvider } from "./components/geolocation-provider";
 import Navbar from "./components/navbar";
-import Footer from "./components/footer";
+import { ThemeProvider } from "./components/theme-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Clima 365",
-  description: "Seu companheiro avançado de previsão do tempo",
+  description: "Seu companheiro diário de previsão do tempo",
 };
 
 export default function RootLayout({
@@ -38,6 +39,7 @@ export default function RootLayout({
             gtag('config', 'G-W0KM5F0CBZ');
           `}
         </Script>
+        <Analytics />
       </head>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
@@ -56,3 +58,4 @@ export default function RootLayout({
     </html>
   );
 }
+

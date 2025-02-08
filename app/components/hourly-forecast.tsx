@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useGeolocation } from "./geolocation-provider";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import Image from "next/image";
@@ -22,16 +21,20 @@ type WeatherItem = {
   }>;
 };
 
-export default function HourlyForecast() {
-  const { latitude, longitude } = useGeolocation();
+type HourlyForecastProps = {
+  lat: number | null;
+  lon: number | null;
+};
+
+export default function HourlyForecast({ lat, lon }: HourlyForecastProps) {
   const [forecast, setForecast] = useState<HourlyForecast[] | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (latitude && longitude) {
+    if (lat && lon) {
       setLoading(true);
       fetch(
-        `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&units=metric&lang=pt_br&appid=${process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY}`
+        `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&lang=pt_br&appid=${process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY}`
       )
         .then((response) => response.json())
         .then((data) => {
@@ -58,7 +61,7 @@ export default function HourlyForecast() {
           setLoading(false);
         });
     }
-  }, [latitude, longitude]);
+  }, [lat, lon]);
 
   return (
     <Card className="w-full max-w-2xl mx-auto">

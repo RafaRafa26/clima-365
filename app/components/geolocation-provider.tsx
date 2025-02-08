@@ -46,7 +46,7 @@ export function GeolocationProvider({
           setGeolocation((prev) => ({
             ...prev,
             error:
-              "Não foi possível obter sua localização. Por favor, ative os serviços de localização.",
+              "Não foi possível obter sua localização. Por favor, ative os serviços de localização ou busque um local abaixo.",
             isPending: false,
           }));
         }
